@@ -1,5 +1,4 @@
 import 'package:bitcoin_ticker/coin_data.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
@@ -45,19 +44,22 @@ class _PriceScreenState extends State<PriceScreen> {
       children: pickedItem,
       itemExtent: 35,
       onSelectedItemChanged: (selectedIndex) {
-        print(selectedIndex);
+        setState(() {
+          selectedCurrency = currenciesList[selectedIndex];
+          getData();
+        });
       },
     );
   }
 
-  String bitcoinValueInUSD = '?';
+  String bitcoinValue = '?';
 
   void getData() async {
     try {
-      double data = await CoinData().getCoinData();
+      double data = await CoinData().getCoinData(selectedCurrency);
 
       setState(() {
-        bitcoinValueInUSD = data.toStringAsFixed(0);
+        bitcoinValue = data.toStringAsFixed(0);
       });
     } catch (e) {
       print(e);
@@ -91,7 +93,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = $bitcoinValueInUSD USD',
+                  '1 BTC = $bitcoinValue $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
