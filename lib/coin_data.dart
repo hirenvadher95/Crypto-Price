@@ -1,5 +1,6 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 
 const List<String> currenciesList = [
   'AUD',
@@ -25,29 +26,33 @@ const List<String> currenciesList = [
   'ZAR'
 ];
 
-const List<String> cryptoList = [
-  'BTC',
-  'ETH',
-  'LTC',
-];
+const List<String> cryptoList = ['BTC', 'ETH', 'LTC'];
+
 const bitcoinAverageURL =
     'https://apiv2.bitcoinaverage.com/indices/global/ticker';
 
 class CoinData {
-  Future getCoinData(String curr) async {
-    Map<String, String> crypto = {};
-    for (String cry in cryptoList) {
-      String requestUrl = '$bitcoinAverageURL/$cry$curr';
+  Future getCoinData(String selectedCurrency) async {
+    Map<String, String> cryptoPrices = {};
 
-      http.Response response = await http.get(requestUrl);
+    for (String crypto in cryptoList) {
+      String requestURL = '$bitcoinAverageURL/$crypto$selectedCurrency';
+
+      http.Response response = await http.get(requestURL);
+
       if (response.statusCode == 200) {
-        var decodeData = jsonDecode(response.body);
-        var lastPrice = decodeData['last'];
-        crypto[cry] = lastPrice.toStringAsFixed(0);
+        var decodedData = jsonDecode(response.body);
+
+        double lastPrice = decodedData['last'];
+
+        cryptoPrices[crypto] = lastPrice.toStringAsFixed(0);
       } else {
-        throw 'Problem with Request';
+        print(response.statusCode);
+
+        throw 'Problem with the get request';
       }
     }
-    return crypto;
+
+    return cryptoPrices;
   }
 }
